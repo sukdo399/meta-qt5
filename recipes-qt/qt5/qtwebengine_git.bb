@@ -17,7 +17,7 @@ DEPENDS += " \
     nss-native \
     nspr-native \
     ninja-native \
-    yasm-native \
+    nasm-native \
     bison-native \
     qtwebchannel \
     qtbase qtdeclarative qtxmlpatterns qtquickcontrols qtquickcontrols2 \
@@ -31,6 +31,7 @@ DEPENDS += " \
 DEPENDS_append_libc-musl = " libexecinfo"
 
 EXTRA_QMAKEVARS_CONFIGURE += "-feature-webengine-system-ninja -no-feature-webengine-system-gn"
+EXTRA_QMAKEVARS_PRE += "CONFIG+=force_debug_info"
 
 # chromium/third_party/openh264/openh264.gyp adds
 # -Wno-format to openh264_cflags_add
@@ -52,12 +53,16 @@ PACKAGECONFIG[libvpx] = "-feature-webengine-system-libvpx,-no-feature-webengine-
 PACKAGECONFIG[libevent] = "-feature-webengine-system-libevent,-no-feature-webengine-system-libevent,libevent"
 PACKAGECONFIG[libpng] = "-feature-webengine-system-png,-no-feature-webengine-system-png,libpng"
 PACKAGECONFIG[harfbuzz] = "-feature-webengine-system-harfbuzz,-no-feature-webengine-system-harfbuzz,harfbuzz"
-PACKAGECONFIG[glib] = "-feature-webengine-system-glib,-no-feature-webengine-system-glib,glib"
+PACKAGECONFIG[glib] = "-feature-webengine-system-glib,-no-feature-webengine-system-glib,glib-2.0"
 PACKAGECONFIG[zlib] = "-feature-webengine-system-zlib,-no-feature-webengine-system-zlib,zlib"
 PACKAGECONFIG[protobuf] = "-feature-webengine-system-protobuf,-no-feature-webengine-system-protobuf,protobuf"
 PACKAGECONFIG[jasoncpp] = "-feature-webengine-system-jsoncpp,-no-feature-webengine-system-jsoncpp,jasoncpp"
 PACKAGECONFIG[libxml2] = "-feature-webengine-system-libxml2,-no-feature-webengine-system-libxml2,libxml2"
 PACKAGECONFIG[minizip] = "-feature-webengine-system-minizip,-no-feature-webengine-system-minizip,minizip"
+PACKAGECONFIG[proprietary-codecs] = "-feature-webengine-proprietary-codecs,-no-feature-webengine-proprietary-codecs"
+PACKAGECONFIG[pepper-plugins] = "-feature-webengine-pepper-plugins,-no-feature-webengine-pepper-plugins"
+PACKAGECONFIG[printing-and-pdf] = "-feature-webengine-printing-and-pdf,-no-feature-webengine-printing-and-pdf"
+PACKAGECONFIG[spellchecker] = "-feature-webengine-spellchecker,-no-feature-webengine-spellchecker"
 
 EXTRA_QMAKEVARS_CONFIGURE += "${PACKAGECONFIG_CONFARGS}"
 
@@ -119,6 +124,9 @@ PACKAGE_DEBUG_SPLIT_STYLE = "debug-without-src"
 # for /usr/share/qt5/qtwebengine_resources.pak
 FILES_${PN} += "${OE_QMAKE_PATH_QT_TRANSLATIONS} ${OE_QMAKE_PATH_QT_DATA}"
 
+# Chromium uses libpci to determine which optimizations/workarounds to apply
+RDEPENDS_${PN}_append_x86 = " libpci"
+
 RDEPENDS_${PN}-examples += " \
     ${PN}-qmlplugins \
     qtquickcontrols-qmlplugins \
@@ -128,7 +136,7 @@ RDEPENDS_${PN}-examples += " \
 QT_MODULE_BRANCH_CHROMIUM = "65-based"
 
 # Patches from https://github.com/meta-qt5/qtwebengine/commits/b5.11
-# 5.11.meta-qt5.6
+# 5.11.meta-qt5.7
 SRC_URI += " \
     ${QT_GIT}/qtwebengine-chromium.git;name=chromium;branch=${QT_MODULE_BRANCH_CHROMIUM};protocol=${QT_GIT_PROTOCOL};destsuffix=git/src/3rdparty \
     file://0001-WebEngine-qquickwebengineview_p_p.h-add-include-QCol.patch \
@@ -162,10 +170,12 @@ SRC_URI_append_libc-musl = "\
     file://chromium/0013-chromium-musl-Adjust-default-pthread-stack-size.patch;patchdir=src/3rdparty \
     file://chromium/0014-chromium-musl-include-asm-generic-ioctl.h-for-TCGETS.patch;patchdir=src/3rdparty \
     file://chromium/0015-chromium-musl-tcmalloc-Use-off64_t-insread-of-__off6.patch;patchdir=src/3rdparty \
+    file://chromium/0016-chromium-musl-Use-_fpstate-instead-of-_libc_fpstate-on-linux.patch;patchdir=src/3rdparty \
+    file://chromium/0017-chromium-musl-elf_reader.cc-include-sys-reg.h-to-get-__WORDSIZE-on.patch;patchdir=src/3rdparty \
 "
 
-SRCREV_qtwebengine = "fe73e5405716531e85440772f69ad74943024eee"
-SRCREV_chromium = "bad02200c68d7e0c758dc4f1805e58d0e03fdea9"
+SRCREV_qtwebengine = "89afebb830f616a6e8c43dd37bf34551f243b264"
+SRCREV_chromium = "7085115f51ce9d02cfff216a3f74b1fb6715f38d"
 SRCREV = "${SRCREV_qtwebengine}"
 
 SRCREV_FORMAT = "qtwebengine_chromium"

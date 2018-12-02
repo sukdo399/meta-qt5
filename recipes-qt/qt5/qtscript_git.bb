@@ -11,7 +11,12 @@ LIC_FILES_CHKSUM = " \
     file://LICENSE.LGPL3;md5=e6a600fd5e1d9cbde2d983680233ad02 \
 "
 
-SRC_URI += "file://0001-javascriptcore-Use-64-bit-ints.patch"
+# Patches from https://github.com/meta-qt5/qtscript/commits/b5.11
+# 5.11.meta-qt5.1
+SRC_URI += " \
+    file://0001-3rdparty-javascriptcore-Add-RISC-V-support.patch \
+    file://0002-Include-asm-sgidefs.h-on-non-glibc-systems.patch \
+"
 
 # qemuarm build fails with:
 # /OE/build/oe-core/tmp-glibc/work/armv5te-oe-linux-gnueabi/qtscript/5.4.1+gitAUTOINC+822df36f25-r0/git/src/3rdparty/javascriptcore/JavaScriptCore/assembler/AssemblerBuffer.h: In member function 'void QTJSC::AssemblerBuffer::putInt64Unchecked(int64_t)':
@@ -32,4 +37,4 @@ DEPENDS += "qtbase"
 # http://errors.yoctoproject.org/Errors/Build/44915/
 LDFLAGS_append_x86 = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
 
-SRCREV = "18c09cd0a3dd8143256fbe22b8e62aea346d17f1"
+SRCREV = "eb28710655e4cf1059ec450527061d777fcb867e"

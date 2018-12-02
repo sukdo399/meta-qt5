@@ -9,9 +9,8 @@ LIC_FILES_CHKSUM = " \
     file://LICENSE.GPL2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
     file://LICENSE.GPL3;md5=d32239bcb673463ab874e80d47fae504 \
     file://LICENSE.GPL3-EXCEPT;md5=763d8c535a234d9a3fb682c7ecb6c073 \
-    file://LGPL_EXCEPTION.txt;md5=9625233da42f9e0ce9d63651a9d97654 \
     file://LICENSE.FDL;md5=6d9f2a9af4c8b8c3c769f6cc1b6aaf7e \
-    file://LICENSE.PREVIEW.COMMERCIAL;md5=8ee24b8d305ef7779e07647a7b70e1bc \
+    file://LICENSE.QT-LICENSE-AGREEMENT-4.0;md5=948f8877345cd66106f11031977a4625 \
 "
 
 QT_MODULE = "qtbase"
@@ -24,7 +23,7 @@ FILESEXTRAPATHS =. "${FILE_DIRNAME}/qtbase:"
 
 # common for qtbase-native, qtbase-nativesdk and qtbase
 # Patches from https://github.com/meta-qt5/qtbase/commits/b5.11-shared
-# 5.11.meta-qt5-shared.6
+# 5.11.meta-qt5-shared.12
 SRC_URI += "\
     file://0001-Add-linux-oe-g-platform.patch \
     file://0002-cmake-Use-OE_QMAKE_PATH_EXTERNAL_HOST_BINS.patch \
@@ -39,13 +38,17 @@ SRC_URI += "\
     file://0011-tst_qlocale-Enable-QT_USE_FENV-only-on-glibc.patch \
     file://0012-mkspecs-common-gcc-base.conf-Use-I-instead-of-isyste.patch \
     file://0013-Upgrade-double-conversion-to-v3.0.0.patch \
+    file://0014-Check-glibc-version-for-renameat2-statx-on-non-boots.patch \
+    file://0015-double-conversion-support-AARCH64EB-and-arm-BE.patch \
+    file://0016-Disable-ltcg-for-host_build.patch \
+    file://0017-Qt5GuiConfigExtras.cmake.in-cope-with-variable-path-.patch \
 "
 
 # common for qtbase-native and nativesdk-qtbase
 # Patches from https://github.com/meta-qt5/qtbase/commits/b5.11-native
-# 5.11.meta-qt5-native.6
+# 5.11.meta-qt5-native.12
 SRC_URI += " \
-    file://0014-Always-build-uic-and-qvkgen.patch \
+    file://0018-Always-build-uic-and-qvkgen.patch \
 "
 
 # CMake's toolchain configuration of nativesdk-qtbase
@@ -53,39 +56,22 @@ SRC_URI += " \
     file://OEQt5Toolchain.cmake \
 "
 
-PACKAGES = "${PN}-tools-dbg ${PN}-tools-dev ${PN}-tools-staticdev ${PN}-tools"
-
 PACKAGE_DEBUG_SPLIT_STYLE = "debug-without-src"
 
-FILES_${PN}-tools-dev = " \
-    ${includedir} \
-    ${FILES_SOLIBSDEV} ${libdir}/*.la \
-    ${libdir}/*.prl \
+FILES_${PN}-dev += " \
     ${OE_QMAKE_PATH_ARCHDATA}/mkspecs \
     ${OE_QMAKE_PATH_LIBS}/*.prl \
 "
 
-FILES_${PN}-tools-staticdev = " \
-    ${OE_QMAKE_PATH_LIBS}/*.a \
-"
-
-FILES_${PN}-tools-dbg = " \
-    ${libdir}/.debug \
-    ${OE_QMAKE_PATH_BINS}/.debug \
-"
-
-FILES_${PN}-tools = " \
-    ${libdir}/lib*${SOLIBS} \
-    ${OE_QMAKE_PATH_BINS}/* \
+FILES_${PN} += " \
     ${SDKPATHNATIVE}/environment-setup.d \
-    ${datadir}/cmake \
 "
 
 # qttools binaries are placed in a subdir of bin in order to avoid
 # collisions with qt4. This would trigger debian.bbclass to rename the
 # package, since it doesn't detect binaries in subdirs. Explicitly
 # disable package auto-renaming for the tools-package.
-DEBIAN_NOAUTONAME_${PN}-tools = "1"
+DEBIAN_NOAUTONAME_${PN} = "1"
 
 QT_CONFIG_FLAGS += " \
     -shared \
@@ -209,4 +195,4 @@ fakeroot do_generate_qt_environment_file() {
 do_generate_qt_environment_file[umask] = "022"
 addtask generate_qt_environment_file after do_install before do_package
 
-SRCREV = "74305ba470f48da8b4c4e806fc714fe9f7649156"
+SRCREV = "49efea26a5fae8c2275999c36c7c8d24cf4125de"
